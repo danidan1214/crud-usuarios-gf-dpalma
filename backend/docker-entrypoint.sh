@@ -10,15 +10,21 @@ if [ ! -f .env ]; then
 fi
 
 # 2) Instalar dependencias de Composer si hace falta
-if [ ! -d vendor ]; then
+if [ ! -f vendor/autoload.php ]; then
     echo ">> Instalando dependencias de Composer..."
     composer install --no-interaction --no-progress --optimize-autoloader
 else
     echo ">> vendor presente, omitiendo composer install"
 fi
 
-# 3) Generar la APP_KEY si esta vacia
-php artisan key:generate
+# 3) Generar la APP_KEY solo si no tiene un valor base64 valido.
+#    (En entorno local key:generate sobrescribe la key existente.)
+if ! grep -q '^APP_KEY=base64:' .env 2>/dev/null; then
+    echo ">> Generando APP_KEY..."
+    php artisan key:generate
+else
+    echo ">> APP_KEY presente, se mantiene"
+fi
 
 # 4) Esperar a la base de datos y correr migraciones
 i=0
