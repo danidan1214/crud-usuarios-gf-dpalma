@@ -1,0 +1,15 @@
+{
+	# Caddy en modo desarrollo: sin panel de admin.
+	admin off
+}
+
+http://:8000 {
+	encode zstd gzip
+
+	root * /app/public
+
+	# php_server se encarga del front controller (try_files hacia index.php),
+	# de ejecutar PHP con FrankenPHP y de servir los assets estaticos.
+	# Modo sin worker: los cambios de codigo se reflejan en cada peticion.
+	php_server
+}
